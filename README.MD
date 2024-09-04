@@ -9,6 +9,16 @@ Interview Warmup Local is a tool designed to help users practice and prepare for
 - Practice answering questions with speech-to-text functionality
 - Receive AI-generated feedback on your answers
 
+
+
+## Demo
+
+To see how Interview Warmup Local works, check out this demo video:
+
+[![Demo Video](assets/InterviewWarmupLocal.mp4)](assets/InterviewWarmupLocal.mp4)
+
+This video provides a step-by-step walkthrough of the application.
+
 ## Setup
 
 1. Clone this repository
