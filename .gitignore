@@ -1,2 +1,4 @@
 voice_models/*
+!voice_models/.gitkeep
 data/*
+!data/.gitkeep
