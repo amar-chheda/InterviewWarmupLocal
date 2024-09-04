@@ -15,7 +15,7 @@ Interview Warmup Local is a tool designed to help users practice and prepare for
 
 To see how Interview Warmup Local works, check out this demo video:
 
-[![Demo Video](assets/InterviewWarmupLocal.mp4)](assets/InterviewWarmupLocal.mp4)
+![Demo Video](assets/InterviewWarmupLocal.gif)
 
 This video provides a step-by-step walkthrough of the application.
 
