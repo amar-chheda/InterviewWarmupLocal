@@ -4,7 +4,8 @@ voice_model:
   sample_rate: 16000
   model_type: whisper
 llm:
-  model: "eramax/fusechat-7b-varm"
+  summary_model: "Qwen/Qwen2-0.5B-Instruct-GGUF"
+  review_model: "Qwen/Qwen2-1.5B-Instruct-GGUF"
   request_timeout: 320.0
   chunk_size: 512
   chunk_overlap: 75
@@ -79,7 +80,39 @@ llm:
       - Key strengths (if applicable):
       - Areas for improvement:
       - Overall assessment of this answer:
+    
+    resume_summary: |
+      You are an expert at summarizing resumes and extracting key information.
+      
+      Given the following resume:
+      {resume}
 
+      please provide a summary of the resume based on the following criteria:
+      - Key skills and experiences
+      - Achievements and accomplishments
+      - Areas of expertise
+      - Education and qualifications
+      - Work experience
+      - Projects and contributions
+      - Certifications and awards
+      - Areas of expertise
+      
+      Keep the summary concise and to the point, ensuring that it captures the most important information.
 
+    job_description_summary: |
+      You are an expert at summarizing job descriptions and extracting key information.
 
+      Given the following job description:
+      {job_description}
 
+      please provide a summary of the job description based on the following criteria:
+      - Key skills and experiences
+      - Achievements and accomplishments
+      - Areas of expertise
+      - Education and qualifications
+      - Work experience
+      - Projects and contributions
+      - Certifications and awards
+      - Areas of expertise
+
+      Keep the summary concise and to the point, ensuring that it captures the most important information.

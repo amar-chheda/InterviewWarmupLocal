@@ -21,12 +21,15 @@ class VoiceModelConfig(BaseModel):
     model_type: str = Field(default="vosk", description="Model type")
 
 class LLMConfig(BaseModel):
-    model: str = Field(..., description="LLM model")
+    summary_model: str = Field(..., description="LLM model to generate summary")
+    review_model: str = Field(..., description="LLM model to generate review")
     request_timeout: float = Field(default=60.0, description="Request timeout")
     chunk_size: int = Field(default=512, description="Chunk size")
     chunk_overlap: int = Field(default=75, description="Chunk overlap")
     embed_model: str = Field(default="BAAI/bge-small-en-v1.5", description="Embedding model")
     prompt_template: Dict[str, str] = Field(..., description="Prompt template")
+    resume_summary_prompt: str = Field(..., description="Prompt to generate resume summary")
+    job_description_summary_prompt: str = Field(..., description="Prompt to generate job description summary")
 
 class ConfigModel(BaseModel):
     voice_model: VoiceModelConfig = Field(..., description="Voice model configuration")

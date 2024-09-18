@@ -19,15 +19,11 @@ from interview_warmup_local.utils import LLMConfig
 from typing import List, Dict
 
 
-class InterviewAnalyzer:
+class LocalLLMHandler:
     def __init__(self, llm_config: LLMConfig):
         self.llm = None
         self.index = None
         self.llm_config = llm_config
-        self.prompt_templates = {
-            'analyze_answer': PromptTemplate(llm_config.prompt_template['question_analysis']),
-            'overall_analysis': PromptTemplate(llm_config.prompt_template['overall_analysis'])
-        }
 
     def initialize_llm(self):
         """
@@ -43,13 +39,13 @@ class InterviewAnalyzer:
         logger.info("LLM initialized")
         return self.llm
 
-    def create_index(self, resume_path: str, job_description_path: str):
+    def create_index(self, input_files: List[str]):
         """
-        Create an index from the resume and job description using local embeddings.
+        Create an index from the given input files using local embeddings.
         """
-        logger.debug(f"Creating index from resume: {resume_path} and job description: {job_description_path}")
+        logger.debug(f"Creating index from files: {input_files}")
 
-        documents = SimpleDirectoryReader(input_files=[resume_path, job_description_path]).load_data()
+        documents = SimpleDirectoryReader(input_files=input_files).load_data()
         self.initialize_llm()
 
         node_parser = SimpleNodeParser.from_defaults()
@@ -58,7 +54,39 @@ class InterviewAnalyzer:
         logger.info("Index created")
         return self.index
 
-    def analyze_answer(self, question: str, answer: str, job_description: str, resume: str) -> str:
+    def query_index(self, prompt: str) -> str:
+        """
+        Query the index with a given prompt.
+        """
+        if not self.index:
+            raise ValueError("Index has not been created. Call create_index() first.")
+
+        query_engine = self.index.as_query_engine()
+        response = query_engine.query(prompt)
+        return str(response)
+
+    def complete_prompt(self, prompt: str) -> str:
+        """
+        Complete a prompt using the LLM.
+        """
+        if not self.llm:
+            raise ValueError("LLM has not been initialized. Call initialize_llm() first.")
+
+        response = self.llm.complete(prompt)
+        return str(response)
+
+
+class InterviewAnalyzer:
+    def __init__(self, llm_config: LLMConfig):
+        self.llm_handler = LocalLLMHandler(llm_config)
+        self.prompt_templates = {
+            'analyze_answer': PromptTemplate(llm_config.prompt_template['question_analysis']),
+            'overall_analysis': PromptTemplate(llm_config.prompt_template['overall_analysis'])
+        }
+        self.job_description = ""
+        self.resume = ""
+
+    def analyze_answer(self, question: str, answer: str) -> str:
         """
         Analyze a single question-answer pair.
         """
@@ -66,11 +94,10 @@ class InterviewAnalyzer:
         prompt = self.prompt_templates['analyze_answer'].format(
             question=question,
             answer=answer,
-            job_description=job_description
+            job_description=self.job_description
         )
 
-        query_engine = self.index.as_query_engine()
-        response = query_engine.query(prompt)
+        response = self.llm_handler.query_index(prompt)
         logger.debug(f"Analysis response: {response}")
         return str(response)
 
@@ -93,12 +120,12 @@ class InterviewAnalyzer:
         logger.debug("Resume loaded")
 
         # Create index using settings
-        _ = self.create_index(resume_path, job_description_path)
+        _ = self.llm_handler.create_index([resume_path, job_description_path])
 
         analyses = []
         for i, (question, answer) in enumerate(zip(questions, answers), 1):
             logger.debug(f"Processing question {i} of {len(questions)}")
-            analysis = self.analyze_answer(question, answer, self.job_description, self.resume)
+            analysis = self.analyze_answer(question, answer)
             analyses.append(analysis)
 
         logger.info("Interview data processing completed")
@@ -114,7 +141,7 @@ class InterviewAnalyzer:
             resume=self.resume,
             job_description=self.job_description
         )
-        response = self.llm.complete(prompt)
+        response = self.llm_handler.complete_prompt(prompt)
         logger.debug(f"Overall analysis response: {response}")
 
         logger.info("Overall analysis generation completed")
