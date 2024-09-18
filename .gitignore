@@ -2,3 +2,7 @@ voice_models/*
 !voice_models/.gitkeep
 data/*
 !data/.gitkeep
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
