@@ -8,6 +8,7 @@ import json
 from interview_warmup_local.utils import read_config
 from interview_warmup_local.audio.speech_to_text import initialize_speech_to_text
 from interview_warmup_local.llm.local_llm import InterviewAnalyzer
+from interview_warmup_local.utils import download_ollama_model
 
 # typing imports
 from typing import List, Dict
@@ -209,4 +210,6 @@ def evaluation_page():
 
 if __name__ == "__main__":
     config = read_config("./config.yaml")  
+    download_ollama_model(config.llm.embed_model)
+    download_ollama_model(config.llm.model)
     main(config=config)
