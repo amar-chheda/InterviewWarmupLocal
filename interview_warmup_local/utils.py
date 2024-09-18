@@ -1,13 +1,14 @@
 # standard imports
 from yaml import safe_load
 from pathlib import Path
+import subprocess
+import shutil
+from loguru import logger
 
 # custom imports
 
 # typing imports
-from typing import Any, Dict
-
-# Pydantic import
+from typing import Any, Dict, List
 from pydantic import BaseModel, Field
 
 
@@ -58,5 +59,31 @@ def read_config(config_path: str) -> ConfigModel:
         return ConfigModel(**config_data)
     except ValueError as e:
         raise ValueError(f"Invalid config file: {e}")
+    
+
+def download_ollama_model(model: str):
+    """
+    Download an Ollama model if it doesn't exist.
+    
+    Args:
+        model (str): Name of the model to download.
+    """
+    if not shutil.which("ollama"):
+        logger.error("Ollama is not installed or not in PATH. Please install Ollama first.")
+        return
+
+    try:
+        # Check if the model exists
+        result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
+        if model not in result.stdout:
+            logger.info(f"Downloading Ollama model: {model}")
+            subprocess.run(["ollama", "pull", model], check=True)
+            logger.info(f"Successfully downloaded Ollama model: {model}")
+        else:
+            logger.info(f"Ollama model {model} already exists.")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Error downloading Ollama model {model}: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error while processing Ollama model {model}: {e}")
 
 
